@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div id="message" class="message"></div>
+    <div class="board" id="board">
+      <div class="cell" id="cell-0" onclick="handleClick(0)"></div>
+      <div class="cell" id="cell-1" onclick="handleClick(1)"></div>
+      <div class="cell" id="cell-2" onclick="handleClick(2)"></div>
+      <div class="cell" id="cell-3" onclick="handleClick(3)"></div>
+      <div class="cell" id="cell-4" onclick="handleClick(4)"></div>
+      <div class="cell" id="cell-5" onclick="handleClick(5)"></div>
+      <div class="cell" id="cell-6" onclick="handleClick(6)"></div>
+      <div class="cell" id="cell-7" onclick="handleClick(7)"></div>
+      <div class="cell" id="cell-8" onclick="handleClick(8)"></div>
+    </div>
+    <button onclick="resetGame()">Reset Game</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+//Code in CSS
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.game-container {
+  background-color: #fff;
+  width: 300px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.message {
+  margin-bottom: 10px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.cell {
+  background-color: #cce5ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+  cursor: pointer;
+  border: 1px solid #99c2ff;
+  transition: background-color 0.3s;
+}
+
+.cell:hover {
+  background-color: #b3d7ff;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+
+
+//Code in Javascript
+let currentPlayer = 'X';
+let cells = ['', '', '', '', '', '', '', '', ''];
+let gameActive = true;
+
+const winningCombinations = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+];
+
+function handleClick(cellIndex) {
+  if (!gameActive || cells[cellIndex] !== '') return;
+
+  cells[cellIndex] = currentPlayer;
+  document.getElementById(`cell-${cellIndex}`).textContent = currentPlayer;
+  
+  if (checkWin()) {
+    document.getElementById('message').textContent = `Player ${currentPlayer} wins!`;
+    gameActive = false;
+    return;
+  }
+  
+  if (checkDraw()) {
+    document.getElementById('message').textContent = 'Draw!';
+    gameActive = false;
+    return;
+  }
+  
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+}
+
+function checkWin() {
+  for (let combination of winningCombinations) {
+    const [a, b, c] = combination;
+    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+      highlightCells(a, b, c);
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkDraw() {
+  return cells.every(cell => cell !== '');
+}
+
+function highlightCells(a, b, c) {
+  document.getElementById(`cell-${a}`).style.backgroundColor = '#85e085';
+  document.getElementById(`cell-${b}`).style.backgroundColor = '#85e085';
+  document.getElementById(`cell-${c}`).style.backgroundColor = '#85e085';
+}
+
+function resetGame() {
+  currentPlayer = 'X';
+  cells = ['', '', '', '', '', '', '', '', ''];
+  gameActive = true;
+  document.getElementById('message').textContent = '';
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.textContent = '';
+    cell.style.backgroundColor = '#cce5ff';
+  });
+}
+
 

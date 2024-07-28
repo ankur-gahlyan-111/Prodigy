@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Scanner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scanner-container">
+    <h1>QR Code Scanner</h1>
+    <video id="video"></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <div id="result" class="result">Scan a QR code...</div>
+  </div>
+
+  <script src="jsQR.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+//Code in CSS
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.scanner-container {
+  background-color: #fff;
+  width: 300px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+video {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.result {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}
+
+.result.valid {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+
+
+
+//Code in Javascript
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const resultContainer = document.getElementById('result');
+
+let scanning = false;
+
+// Check if the browser supports getUserMedia
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+      video.srcObject = stream;
+      video.play();
+      scanQRCode();
+    })
+    .catch(function(error) {
+      console.error('Error accessing the camera:', error);
+      alert('Error accessing the camera. Please allow camera access.');
+    });
+} else {
+  console.error('getUserMedia is not supported by this browser');
+  alert('getUserMedia is not supported by this browser.');
+}
+
+function scanQRCode() {
+  if (!scanning) {
+    scanning = true;
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const scan = () => {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (code) {
+        resultContainer.textContent = code.data;
+        resultContainer.classList.add('valid');
+      }
+
+      if (scanning) {
+        requestAnimationFrame(scan);
+      }
+    };
+
+    scan();
+  }
+}
 
